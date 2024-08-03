@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import Navbar from '../components/Navbar';
 import ActionButton from '../components/ActionButton';
 import ShareButton from '../components/ShareButton';
@@ -12,6 +13,7 @@ const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
 export default function HomeScreen() {
+  const navigation = useNavigation();
   const [locationServices, setLocationServices] = useState(true);
   const [microphone, setMicrophone] = useState(true);
   const [iAmSafe, setIAmSafe] = useState(false);
@@ -48,7 +50,7 @@ export default function HomeScreen() {
         />
       </View>
       
-      <Navbar onMenuPress={handleMenuPress} />
+      <Navbar onMenuPress={() => navigation.toggleDrawer()} />
       
       <SafeAreaView style={styles.contentContainer} edges={['right', 'bottom', 'left']}>
         <TouchableOpacity style={styles.openMapsButton}>
