@@ -90,8 +90,9 @@ export default function HomeScreen() {
           <ShareButton onPress={() => console.log('Share live activity')} />
 
           <View style={styles.settingsContainer}>
+            <Text style={styles.settingsHeaderText}>Following will be shared to trusted contacts</Text>
             <SettingItem
-              title="Location Services"
+              title="Location"
               value={locationServices}
               onValueChange={setLocationServices}
               iconName="location-outline"

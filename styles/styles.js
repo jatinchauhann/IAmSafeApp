@@ -83,6 +83,11 @@ export default StyleSheet.create({
       settingTitle: {
         marginLeft: 10,
       },
+      settingsHeaderText: {
+        color: '#007AFF',
+        fontSize: 12,
+        marginBottom: 5,
+      },
       settingIconContainer: {
         width: 30,
         height: 30,
