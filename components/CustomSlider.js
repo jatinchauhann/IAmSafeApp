@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { View, Animated, PanResponder, StyleSheet, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
-const SLIDER_WIDTH = width * 0.8; // 80% of screen width
+const SLIDER_WIDTH = width * 0.5; // 80% of screen width
 const KNOB_WIDTH = SLIDER_WIDTH * 0.45; // 45% of slider width
 
 const CustomSlider = ({ onToggle }) => {
@@ -78,7 +78,6 @@ const CustomSlider = ({ onToggle }) => {
             },
           ]}
         >
-          Active
         </Animated.Text>
       </Animated.View>
     </View>
