@@ -1,8 +1,8 @@
+// HomeScreen.js
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import Navbar from '../components/Navbar';
+import { useNavigation } from '@react-navigation/native';  // Add this line
 import ActionButton from '../components/ActionButton';
 import ShareButton from '../components/ShareButton';
 import SettingItem from '../components/SettingItem';
@@ -37,10 +37,6 @@ export default function HomeScreen() {
     }
   }, [iAmSafe]);
 
-  const handleMenuPress = () => {
-    console.log('Menu pressed');
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.mapContainer}>
@@ -50,13 +46,11 @@ export default function HomeScreen() {
         />
       </View>
       
-      <Navbar onMenuPress={() => navigation.toggleDrawer()} />
-      
       <SafeAreaView style={styles.contentContainer} edges={['right', 'bottom', 'left']}>
         <TouchableOpacity style={styles.openMapsButton}>
           <Text style={styles.openMapsText}>Open Maps</Text>
         </TouchableOpacity>
-        
+                
         <View style={styles.bottomAlignedContent}>
           <Animated.View style={[
             styles.listeningContainer,
