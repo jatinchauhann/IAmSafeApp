@@ -1,4 +1,8 @@
 import { StyleSheet } from 'react-native';
+import { Dimensions } from 'react-native';
+
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
 
 export default StyleSheet.create({
     container: {
@@ -18,6 +22,13 @@ export default StyleSheet.create({
       },
       mapContainer: {
         ...StyleSheet.absoluteFillObject,
+        height: screenHeight,
+        width: screenWidth,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+      },
+      map: {
+        ...StyleSheet.absoluteFillObject,
       },
       mapImage: {
         width: '100%',
@@ -30,7 +41,7 @@ export default StyleSheet.create({
       },
       bottomAlignedContent: {
         justifyContent: 'flex-end',
-        paddingBottom: 20,
+        // paddingBottom: 10,
       },
       navbar: {
         position: 'absolute',
@@ -253,7 +264,7 @@ export default StyleSheet.create({
       },
       poweredByAI: {
         color: '#8E8E93',
-        fontSize: 10,
+        fontSize: 9,
         position: 'absolute',
         bottom: 5,
         right: 10,

@@ -12,12 +12,21 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "Removed due to security reason"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.anonymous.IAmSafeApp",
+      "config": {
+        "googleMaps": {
+          "apiKey": "Removed due to security reason"
+        }
       }
     },
     "web": {

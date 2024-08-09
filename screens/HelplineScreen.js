@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Linking } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Linking, RefreshControl, TextInput } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { helplineBot } from '../geminiConfig';
 
@@ -8,12 +9,26 @@ function HelplineScreen() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [location, setLocation] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const cachedHelplines = useRef(null);
 
     useEffect(() => {
         getLocationAndFetchHelplines();
     }, []);
 
-    const getLocationAndFetchHelplines = async () => {
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        getLocationAndFetchHelplines(true).then(() => setRefreshing(false));
+    }, []);
+
+    const getLocationAndFetchHelplines = async (forceRefresh = false) => {
+        if (!forceRefresh && cachedHelplines.current) {
+            // console.log("Using cached helplines:", cachedHelplines.current);
+            setHelplines(cachedHelplines.current);
+            return;
+        }
+
         setIsLoading(true);
         setError(null);
         try {
@@ -38,9 +53,11 @@ function HelplineScreen() {
     const fetchHelplines = async (latitude, longitude) => {
         try {
             const result = await helplineBot.getHelplines(latitude, longitude);
-            console.log("Helplines fetched:", result);  // For debugging
+            // console.log("Helplines fetched:", result);
             const parsedHelplines = parseHelplines(result);
+            // console.log("Parsed helplines:", parsedHelplines);
             setHelplines(parsedHelplines);
+            cachedHelplines.current = parsedHelplines;
         } catch (err) {
             console.error("Error fetching helplines:", err);
             setError('Failed to fetch helplines. Please try again.');
@@ -65,18 +82,34 @@ function HelplineScreen() {
     };
 
     const renderHelplines = () => {
-        if (!helplines) return null;
+        if (!helplines) {
+            console.log("No helplines to render");
+            return null;
+        }
+
+        // console.log("Rendering helplines:", helplines);
+
+        const filteredHelplines = helplines.helplines.filter(helpline => 
+            helpline.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            helpline.number.includes(searchQuery)
+        );
 
         return (
             <View style={styles.helplineList}>
-                {helplines.helplines.map((helpline, index) => (
+                {filteredHelplines.map((helpline, index) => (
                     <TouchableOpacity
                         key={index}
                         style={styles.helplineItem}
                         onPress={() => callHelpline(helpline.number)}
                     >
-                        <Text style={styles.helplineName}>{helpline.name}</Text>
-                        <Text style={styles.helplineNumber}>{helpline.number}</Text>
+                        <View style={styles.helplineNameContainer}>
+                            <Text style={styles.helplineName} numberOfLines={2} ellipsizeMode="tail">
+                                {helpline.name}
+                            </Text>
+                        </View>
+                        <View style={styles.helplineNumberContainer}>
+                            <Text style={styles.helplineNumber}>{helpline.number}</Text>
+                        </View>
                     </TouchableOpacity>
                 ))}
             </View>
@@ -90,7 +123,7 @@ function HelplineScreen() {
     if (isLoading) {
         return (
             <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#0000ff" />
+                <ActivityIndicator size="large" color="#000000" />
                 <Text>Getting location and loading helplines...</Text>
             </View>
         );
@@ -100,7 +133,7 @@ function HelplineScreen() {
         return (
             <View style={styles.centerContainer}>
                 <Text style={styles.errorText}>{error}</Text>
-                <TouchableOpacity style={styles.retryButton} onPress={getLocationAndFetchHelplines}>
+                <TouchableOpacity style={styles.retryButton} onPress={() => getLocationAndFetchHelplines(true)}>
                     <Text style={styles.retryButtonText}>Retry</Text>
                 </TouchableOpacity>
             </View>
@@ -108,11 +141,28 @@ function HelplineScreen() {
     }
 
     return (
-        <ScrollView style={styles.container}>
-            <Text style={styles.title}>Emergency Contacts</Text>
-            {/* {helplines && <Text style={styles.locationText}>Location: {helplines.location}</Text>} */}
-            {renderHelplines()}
-        </ScrollView>
+        <View style={styles.container}>
+            <View style={styles.searchContainer}>
+                <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+                <TextInput
+                    style={styles.searchBar}
+                    placeholder="Search helplines..."
+                    placeholderTextColor="#888"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                />
+            </View>
+            <ScrollView 
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+            >
+                {/* <Text style={styles.title}>Emergency Contacts</Text> */}
+                {/* <Text>Swipe down to refresh...</Text> */}
+                {helplines && <Text style={styles.locationText}>Location: {helplines.location}</Text>}
+                {renderHelplines()}
+            </ScrollView>
+        </View>
     );
 }
 
@@ -120,6 +170,27 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f0f0f0',
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        borderRadius: 25,
+        margin: 16,
+        paddingHorizontal: 15,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    searchIcon: {
+        marginRight: 10,
+    },
+    searchBar: {
+        flex: 1,
+        height: 50,
+        fontSize: 16,
     },
     centerContainer: {
         flex: 1,
@@ -150,13 +221,21 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
     },
+    helplineNameContainer: {
+        flex: 2,
+        marginRight: 10,
+    },
     helplineName: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
     },
+    helplineNumberContainer: {
+        flex: 1,
+    },
     helplineNumber: {
-        fontSize: 18,
+        fontSize: 16,
         color: 'blue',
+        textAlign: 'right',
     },
     errorText: {
         color: 'red',
