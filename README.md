@@ -39,8 +39,7 @@ IAmSafe is an innovative personal safety application leveraging Google's Gemini 
 
 ## Configuration
 
-1. Rename `.env.example` to `.env`
-2. Add your Google Gemini AI API key to the `.env` file:
+1. Add your Google Gemini AI API key to the `.geminiConfig.json` file:
    ```
    GEMINI_API_KEY=your_api_key_here
    ```
