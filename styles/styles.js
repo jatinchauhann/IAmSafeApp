@@ -271,7 +271,7 @@ export default StyleSheet.create({
       },
       openMapsButton: {
         position: 'absolute',
-        top: 120,
+        top: 10,
         right: 15,
         backgroundColor: 'white',
         paddingHorizontal: 10,
